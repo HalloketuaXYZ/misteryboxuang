@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystery Box Gacor</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { 
+            margin: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: radial-gradient(circle, #2d3436 0%, #000000 100%); color: white; font-family: 'Segoe UI', sans-serif;
+        }
+        .box {
+            width: 150px; height: 150px; background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px; display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .shake { animation: shake 0.5s infinite; }
+        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(10deg); } 75% { transform: rotate(-10deg); } 100% { transform: rotate(0deg); } }
+        
+        input { padding: 12px; border-radius: 8px; border: none; margin-bottom: 10px; width: 250px; }
+        button { padding: 12px 25px; border-radius: 8px; border: none; background: #e74c3c; color: white; cursor: pointer; font-weight: bold; }
+        #result { margin-top: 20px; font-size: 1.5rem; font-weight: bold; color: #f1c40f; }
+        #actionArea { margin-top: 20px; display: none; }
+        .claim-btn { background: #2ecc71; padding: 15px 30px; border-radius: 50px; font-size: 1.2rem; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div id="loginSection">
+        <input type="text" id="userId" placeholder="Masukkan ID Kamu">
+        <br>
+        <button onclick="cekId()">Mulai Buka Box</button>
+    </div>
+
+    <div id="gameSection" style="display:none; text-align: center;">
+        <div class="box shake" id="box" onclick="bukaBox()">🎁</div>
+        <div id="result"></div>
+        <div id="actionArea">
+            <a href="https://lawaswow.com/" style="text-decoration: none;">
+                <button class="claim-btn">CLAIM HADIAH SEKARANG</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function cekId() {
+            const uid = document.getElementById('userId').value;
+            if (!uid) return alert("Masukkan ID dulu!");
+            
+            if (localStorage.getItem('claimed_' + uid)) {
+                return alert("ID ini sudah pernah mengambil hadiah!");
+            }
+            
+            document.getElementById('loginSection').style.display = "none";
+            document.getElementById('gameSection').style.display = "block";
+        }
+
+        function bukaBox() {
+            const uid = document.getElementById('userId').value;
+            document.getElementById('box').classList.remove('shake');
+            document.getElementById('box').style.pointerEvents = "none";
+            
+            // Logika Peluang
+            const r = Math.random();
+            let hadiah;
+            if (r < 0.60) hadiah = 100000;
+            else if (r < 0.85) hadiah = 250000;
+            else if (r < 0.95) hadiah = 500000;
+            else if (r < 0.99) hadiah = 750000;
+            else hadiah = 1000000;
+
+            confetti({ particleCount: 200, spread: 100 });
+            document.getElementById('result').innerText = "Selamat! Kamu dapat: Rp " + hadiah.toLocaleString('id-ID');
+            document.getElementById('actionArea').style.display = "block";
+            
+            localStorage.setItem('claimed_' + uid, 'true');
+        }
+    </script>
+</body>
+</html>
