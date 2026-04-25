@@ -2,132 +2,39 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mystery Box Event</title>
+    <title>Gacor Mystery Box</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root {
-            --primary-gold: #ffd700;
-            --dark-bg: #0a0a0a;
-            --card-bg: rgba(20, 20, 20, 0.9);
-        }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { text-align: center; width: 90%; max-width: 400px; }
         
-        body {
-            margin: 0; padding: 0; height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            background: linear-gradient(135deg, #1f1c2c, #000000);
-            color: white; font-family: 'Arial Black', sans-serif;
-            overflow: hidden;
-        }
-
-        .main-card {
-            background: var(--card-bg);
-            border: 2px solid var(--primary-gold);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-            width: 90%; max-width: 400px;
-        }
-
-        .header-logo {
-            /* Teks atau Logo Utama */
-            color: var(--primary-gold);
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        /* Styling Interaktif untuk Kotak 3D */
-        .box-trigger {
-            width: 100%;
-            max-width: 250px;
-            margin: 20px auto;
-            cursor: pointer;
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-            position: relative;
-        }
-        
-        .box-trigger img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 15px; /* Sedikit lengkungan agar tidak kaku */
-        }
-
-        /* Efek Hover untuk Kesan Gacor */
-        .box-trigger:hover {
-            transform: scale(1.08) rotate(3deg);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
-        }
-        
-        /* Animasi Shake saat Load */
+        /* Box Styling */
+        .box-container { width: 250px; margin: 20px auto; cursor: pointer; transition: 0.3s; }
+        .box-img { width: 100%; transition: transform 0.3s; }
+        .box-container:hover { transform: scale(1.05); }
         .shake { animation: shakeEffect 0.5s infinite; }
-        @keyframes shakeEffect { 0% {transform: rotate(0deg);} 25% {transform: rotate(5deg);} 75% {transform: rotate(-5deg);} 100% {transform: rotate(0deg);} }
-
-        /* Input ID */
-        input {
-            width: 80%;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: 1px solid var(--primary-gold);
-            background: #222;
-            color: #fff;
-            text-align: center;
-            font-size: 1rem;
-        }
+        @keyframes shakeEffect { 0%, 100% {transform: rotate(0deg);} 25% {transform: rotate(5deg);} 75% {transform: rotate(-5deg);} }
         
-        .btn {
-            padding: 15px 30px;
-            background: var(--primary-gold);
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 85%;
-            font-size: 1rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        
-        #result {
-            margin: 20px 0;
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-gold);
-            text-shadow: 0 0 15px #fff;
-            display: none;
-        }
-        
-        #actionArea { margin-top: 20px; display: none; }
+        .btn { padding: 15px 30px; background: gold; color: #000; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        #result { margin: 20px 0; font-size: 1.8rem; font-weight: bold; color: gold; display: none; }
+        #actionArea { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="main-card">
-        <div class="header-logo">Mystery Event</div>
-        
+    <div class="container">
         <div id="loginSection">
-            <p>Masukkan User ID Anda untuk Claim Hadiah:</p>
-            <input type="text" id="userId" placeholder="USER ID ANDA">
-            <br>
-            <button class="btn" onclick="cekId()">MASUK</button>
+            <input type="text" id="userId" placeholder="MASUKKAN ID" style="padding:10px; border-radius:5px;">
+            <br><br><button class="btn" onclick="cekId()">MASUK</button>
         </div>
 
         <div id="gameSection" style="display:none;">
-            <div class="box-trigger shake" id="box" onclick="bukaBox()">
-                <img src="https://i.ibb.co/rf44Yt4V/Chat-GPT-Image-Apr-26-2026-05-20-07-AM.png" alt="3D Gacor Mystery Box">
+            <div class="box-container shake" id="boxContainer" onclick="bukaBox()">
+                <img id="boxImage" src="https://i.ibb.co/rf44Yt4V/Chat-GPT-Image-Apr-26-2026-05-20-07-AM.png" class="box-img" alt="Box Tertutup">
             </div>
-            
-            <div id="result">MENANG: Rp 0</div>
-            
+            <div id="result"></div>
             <div id="actionArea">
-                <a href="https://lawaswow.com/" style="text-decoration: none;">
-                    <button class="btn">CLAIM HADIAH SEKARANG</button>
-                </a>
+                <a href="https://lawaswow.com/"><button class="btn">CLAIM HADIAH</button>
             </div>
         </div>
     </div>
@@ -135,40 +42,29 @@
     <script>
         function cekId() {
             const uid = document.getElementById('userId').value;
-            if (!uid) return alert("Masukkan User ID!");
-            
-            // Cek apakah ID sudah pernah buka
-            if (localStorage.getItem('claimed_' + uid)) {
-                return alert("User ID ini sudah pernah mengambil hadiah!");
-            }
-            
+            if (!uid) return alert("Isi ID!");
             document.getElementById('loginSection').style.display = "none";
             document.getElementById('gameSection').style.display = "block";
         }
 
         function bukaBox() {
-            const uid = document.getElementById('userId').value;
-            document.getElementById('box').classList.remove('shake');
-            document.getElementById('box').style.pointerEvents = "none"; // Nonaktifkan klik
-
-            // Logika Peluang Hadiah
-            const r = Math.random();
-            const hadiahArr = ["100.000", "250.000", "500.000", "750.000", "1.000.000"];
-            const hasilIndex = (r < 0.60) ? 0 : (r < 0.85) ? 1 : (r < 0.95) ? 2 : (r < 0.99) ? 3 : 4;
-            const hasilNominal = hadiahArr[hasilIndex];
-
-            // Efek Ledakan Confetti
-            confetti({ particleCount: 200, spread: 100, colors: ['#ffd700', '#ffffff'] });
-
+            // 1. Berhenti bergoyang
+            document.getElementById('boxContainer').classList.remove('shake');
+            
+            // 2. Ganti ke gambar box terbuka
+            document.getElementById('boxImage').src = "https://i.ibb.co/Myv4XBpd/image.png";
+            
+            // 3. Efek Confetti & Hasil
+            confetti({ particleCount: 200, spread: 100 });
+            
             setTimeout(() => {
-                const resultDiv = document.getElementById('result');
-                resultDiv.innerText = "MENANG: Rp " + hasilNominal;
-                resultDiv.style.display = "block";
-                document.getElementById('actionArea').style.display = "block";
+                const hadiah = ["100.000", "250.000", "500.000", "750.000", "1.000.000"];
+                const hasil = hadiah[Math.floor(Math.random() * hadiah.length)];
                 
-                // Simpan status agar tidak bisa buka lagi
-                localStorage.setItem('claimed_' + uid, 'true');
-            }, 300); // Sedikit delay sebelum hasil muncul
+                document.getElementById('result').innerText = "MENANG: Rp " + hasil;
+                document.getElementById('result').style.display = "block";
+                document.getElementById('actionArea').style.display = "block";
+            }, 500);
         }
     </script>
 </body>
