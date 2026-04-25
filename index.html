@@ -2,39 +2,57 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Gacor Mystery Box</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYSTERY BOX EVENT</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { text-align: center; width: 90%; max-width: 400px; }
+        body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Arial', sans-serif; overflow: hidden; }
         
-        /* Box Styling */
-        .box-container { width: 250px; margin: 20px auto; cursor: pointer; transition: 0.3s; }
-        .box-img { width: 100%; transition: transform 0.3s; }
-        .box-container:hover { transform: scale(1.05); }
-        .shake { animation: shakeEffect 0.5s infinite; }
-        @keyframes shakeEffect { 0%, 100% {transform: rotate(0deg);} 25% {transform: rotate(5deg);} 75% {transform: rotate(-5deg);} }
+        /* Background Utama */
+        .hero-bg { position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
+
+        .container { text-align: center; color: white; width: 90%; max-width: 500px; z-index: 1; }
         
-        .btn { padding: 15px 30px; background: gold; color: #000; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        #result { margin: 20px 0; font-size: 1.8rem; font-weight: bold; color: gold; display: none; }
-        #actionArea { display: none; }
+        /* Logo & Judul */
+        .logo { width: 80%; max-width: 300px; margin-bottom: 20px; }
+        h1 { color: gold; text-shadow: 0 0 10px gold; font-size: 1.8rem; text-transform: uppercase; }
+
+        /* Input 3D Style */
+        .input-wrapper { background: rgba(0,0,0,0.6); padding: 15px; border: 2px solid gold; border-radius: 10px; display: flex; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        input { background: transparent; border: none; color: white; width: 60%; font-size: 1.2rem; outline: none; }
+        .btn { padding: 12px 25px; background: gold; color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { transform: scale(1.05); }
+
+        /* Box Animation */
+        .box-trigger { width: 200px; margin: 30px auto; cursor: pointer; transition: 0.3s; }
+        .box-trigger:hover { transform: scale(1.05); }
+        .box-img { width: 100%; filter: drop-shadow(0 0 10px gold); }
+        
+        #result { font-size: 2rem; color: gold; font-weight: bold; margin: 20px 0; display: none; text-shadow: 0 0 10px black; }
     </style>
 </head>
 <body>
 
+    <img src="https://imgur.com/R9MkL6b" class="hero-bg">
+
     <div class="container">
+        <img src="https://i.ibb.co/zLrG7b8/mysterybox.png" class="logo">
+        <h1>MYSTERY BOX EVENT</h1>
+
         <div id="loginSection">
-            <input type="text" id="userId" placeholder="MASUKKAN ID" style="padding:10px; border-radius:5px;">
-            <br><br><button class="btn" onclick="cekId()">MASUK</button>
+            <div class="input-wrapper">
+                <input type="text" id="userId" placeholder="USER ID ANDA">
+                <button class="btn" onclick="cekId()">MASUK</button>
+            </div>
         </div>
 
         <div id="gameSection" style="display:none;">
-            <div class="box-container shake" id="boxContainer" onclick="bukaBox()">
-                <img id="boxImage" src="https://i.ibb.co/rf44Yt4V/Chat-GPT-Image-Apr-26-2026-05-20-07-AM.png" class="box-img" alt="Box Tertutup">
+            <div class="box-trigger" id="boxContainer" onclick="bukaBox()">
+                <img id="boxImage" src="https://i.ibb.co/rf44Yt4V/Chat-GPT-Image-Apr-26-2026-05-20-07-AM.png" class="box-img">
             </div>
             <div id="result"></div>
-            <div id="actionArea">
-                <a href="https://lawaswow.com/"><button class="btn">CLAIM HADIAH</button>
+            <div id="actionArea" style="display:none;">
+                <a href="https://lawaswow.com/"><button class="btn" style="width:100%;">CLAIM HADIAH SEKARANG</button></a>
             </div>
         </div>
     </div>
@@ -42,26 +60,23 @@
     <script>
         function cekId() {
             const uid = document.getElementById('userId').value;
-            if (!uid) return alert("Isi ID!");
+            if(!uid) return alert("Isi ID dulu!");
             document.getElementById('loginSection').style.display = "none";
             document.getElementById('gameSection').style.display = "block";
         }
 
+        let diklik = false;
         function bukaBox() {
-            // 1. Berhenti bergoyang
-            document.getElementById('boxContainer').classList.remove('shake');
+            if(diklik) return;
+            diklik = true;
             
-            // 2. Ganti ke gambar box terbuka
+            // Ganti ke gambar terbuka
             document.getElementById('boxImage').src = "https://i.ibb.co/Myv4XBpd/image.png";
-            
-            // 3. Efek Confetti & Hasil
             confetti({ particleCount: 200, spread: 100 });
             
             setTimeout(() => {
-                const hadiah = ["100.000", "250.000", "500.000", "750.000", "1.000.000"];
-                const hasil = hadiah[Math.floor(Math.random() * hadiah.length)];
-                
-                document.getElementById('result').innerText = "MENANG: Rp " + hasil;
+                const h = ["100rb", "250rb", "500rb", "750rb", "1JT"];
+                document.getElementById('result').innerText = "MENANG: Rp " + h[Math.floor(Math.random()*h.length)];
                 document.getElementById('result').style.display = "block";
                 document.getElementById('actionArea').style.display = "block";
             }, 500);
