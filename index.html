@@ -7,47 +7,82 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Arial', sans-serif; overflow: hidden; background: #000; }
+        
+        /* Background Utama */
         .hero-bg { position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
+
         .container { text-align: center; color: white; width: 90%; max-width: 500px; z-index: 1; }
         
+        /* Logo & Judul */
         .logo { width: 80%; max-width: 300px; margin-bottom: 20px; }
         h1 { color: gold; text-shadow: 0 0 10px gold; font-size: 1.8rem; text-transform: uppercase; margin-bottom: 20px; }
 
+        /* Input ID Style (Dipertahankan dari sebelumnya) */
         .input-wrapper { background: rgba(0,0,0,0.6); padding: 15px; border: 2px solid gold; border-radius: 10px; display: flex; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         input { 
-    background: rgba(0,0,0,0.6); /* Sedikit gelap agar kontras */
-    border: 2px solid gold;      /* Border emas biar terlihat 3D */
-    color: white;                /* Warna teks yang diketik */
-    font-weight: bold;           /* Membuat teks jadi tebal (bold) */
-    padding: 15px; 
-    width: 80%; 
-    border-radius: 10px; 
-    text-align: center; 
-    font-size: 1.2rem; 
-    outline: none;
-}
-input {
-    /* ... (tambahkan baris ini) ... */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255,255,255,0.2);
-}
-/* Mengubah warna teks placeholder (tulisan "USER ID ANDA") */
-input::placeholder {
-    color: white;
-    font-weight: bold;
-    opacity: 0.8; /* Sedikit transparan agar lebih elegan */
-}
-        .btn { padding: 12px 25px; background: gold; color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+            background: transparent; border: none; width: 60%; font-size: 1.2rem; outline: none; text-align: center;
+            color: white; /* Warna teks yang diketik */
+            font-weight: bold; /* Teks yang diketik tebal */
+        }
+        /* Style untuk Placeholder (Tulisan "USER ID ANDA") */
+        input::placeholder { color: white; font-weight: bold; opacity: 0.8; }
+        
+        .btn { padding: 12px 25px; background: gold; color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { transform: scale(1.05); }
 
-        /* Posisi Box & Hasil */
-        .box-container { width: 400px; margin: 30px auto; cursor: pointer; position: relative; transition: 0.3s; }
+        /* Box Animation */
+        .box-container { width: 300px; margin: 30px auto; cursor: pointer; transition: 0.3s; position: relative; }
+        .box-container:hover { transform: scale(1.05); }
         .box-img { width: 100%; filter: drop-shadow(0 0 10px gold); }
         
-        /* Area Hadiah (Muncul di tengah box) */
+        /* Area Hadiah (Di dalam box - Dipertahankan dari sebelumnya) */
         #resultDisplay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: gold; font-size: 1.2rem; font-weight: bold; text-shadow: 2px 2px 4px black;
+            color: gold; font-size: 1.8rem; font-weight: bold; text-shadow: 2px 2px 4px black;
             display: none; width: 90%;
         }
+
+        /* --- STYLE BARU UNTUK POP-UP ANIMASI --- */
+
+        /* Overlay Pop-Up (Background Gelap) */
+        #popup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 99;
+            opacity: 0; /* Mulai dari transparan */
+            transition: opacity 0.5s ease; /* Fade-in perlahan */
+        }
+        
+        /* Saat Pop-Up aktif, Fade-in */
+        #popup.active { opacity: 1; }
+
+        /* Konten Pop-Up */
+        .popup-content {
+            background: rgba(20, 20, 20, 0.95); 
+            padding: 40px; 
+            border: 3px solid gold; 
+            border-radius: 20px; 
+            text-align: center; 
+            width: 80%; 
+            max-width: 350px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            
+            /* Animasi Konten (Fade-in + Scale-up) */
+            opacity: 0;
+            transform: scale(0.7); /* Mulai dari kecil */
+            transition: all 0.5s ease-out; /* Animasi membesar dan muncul */
+        }
+
+        /* Saat Pop-Up aktif, Konten muncul dan membesar */
+        #popup.active .popup-content {
+            opacity: 1;
+            transform: scale(1); /* Ukuran normal */
+        }
+
+        .popup-content h2 { color: gold; font-size: 2.2rem; font-weight: bold; margin-bottom: 25px; text-shadow: 2px 2px 4px black; }
+
+        /* Tombol Claim di dalam Pop-up */
+        .btn-claim { width: 100%; font-size: 1.1rem; padding: 15px; }
+
     </style>
 </head>
 <body>
@@ -70,36 +105,72 @@ input::placeholder {
                 <img id="boxImage" src="https://i.ibb.co/rf44Yt4V/Chat-GPT-Image-Apr-26-2026-05-20-07-AM.png" class="box-img">
                 <div id="resultDisplay"></div>
             </div>
-            
-            <div id="actionArea" style="display:none;">
-                <a href="https://lawaswow.com/"><button class="btn" style="width:100%;">CLAIM HADIAH SEKARANG</button></a>
-            </div>
+        </div>
+    </div>
+
+    <div id="popup">
+        <div class="popup-content">
+            <h2 id="resultText">MENANG: Rp 0</h2>
+            <a href="https://lawaswow.com/" style="text-decoration: none;">
+                <button class="btn btn-claim">CLAIM HADIAH SEKARANG</button>
+            </a>
         </div>
     </div>
 
     <script>
+        // Fungsi Validasi ID
         function cekId() {
             const uid = document.getElementById('userId').value;
-            if(!uid) return alert("Isi ID dulu!");
+            if(!uid) return alert("User ID tidak boleh kosong!");
+            
+            // Cek apakah ID sudah digunakan
+            if(localStorage.getItem('claimed_' + uid)) {
+                return alert("User ID ini sudah pernah mengambil hadiah!");
+            }
+            
             document.getElementById('loginSection').style.display = "none";
             document.getElementById('gameSection').style.display = "block";
         }
 
-        let diklik = false;
+        let diklik = false; // Penjaga Anti-Spam Klik
+
+        // Fungsi Membuka Box
         function bukaBox() {
             if(diklik) return;
             diklik = true;
+            const uid = document.getElementById('userId').value;
             
+            // 1. Ganti ke gambar box terbuka
             document.getElementById('boxImage').src = "https://i.ibb.co/Myv4XBpd/image.png";
-            confetti({ particleCount: 200, spread: 100 });
             
+            // 2. Efek Confetti (Ceria)
+            confetti({ particleCount: 200, spread: 120, colors: ['#ffd700', '#ffffff', '#ff0000'] });
+            
+            // 3. Logika Menghitung Hadiah & Menampilkan Pop-Up (Delay 0.8s)
             setTimeout(() => {
-                const h = ["100rb", "250rb", "500rb", "750rb", "1JT"];
-                const res = document.getElementById('resultDisplay');
-                res.innerText = "MENANG: Rp " + h[Math.floor(Math.random()*h.length)];
-                res.style.display = "block";
-                document.getElementById('actionArea').style.display = "block";
-            }, 500);
+                // Daftar Hadiah Gacor
+                const hadiahArr = ["100rb", "250rb", "500rb", "750rb", "1JT"];
+                // Peluang lebih besar untuk hadiah 1JT (Hanya contoh logika, bisa diubah)
+                const r = Math.random();
+                let hasilIndex = (r < 0.60) ? 0 : (r < 0.85) ? 1 : (r < 0.95) ? 2 : (r < 0.99) ? 3 : 4;
+                
+                const hasilFinal = hadiahArr[hasilIndex];
+                
+                // Tampilkan Teks di Pop-Up
+                const resultTextDiv = document.getElementById('resultText');
+                resultTextDiv.innerText = "MENANG: Rp " + hasilFinal;
+                
+                // --- AKTIFKAN POP-UP DENGAN ANIMASI ---
+                const popup = document.getElementById('popup');
+                popup.style.display = "flex"; // Tampilkan dulu flex container-nya
+                
+                // Delay sangat singkat agar CSS Transition (Fade-in) bekerja
+                setTimeout(() => { popup.classList.add('active'); }, 50); 
+                
+                // Simpan status agar tidak bisa buka lagi
+                localStorage.setItem('claimed_' + uid, 'true');
+                
+            }, 800);
         }
     </script>
 </body>
