@@ -2,204 +2,80 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MYSTERY BOX EVENT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MYSTERY BOX</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Container untuk notifikasi berjalan */
-.marquee-container {
-    width: 100%;
-    overflow: hidden;
-    background: rgba(255, 215, 0, 0.2); /* Warna emas transparan */
-    padding: 8px 0;
-    position: absolute;
-    top: 0;
-    z-index: 10;
-    border-bottom: 1px solid gold;
-}
+        /* Reset & Base */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; font-family: sans-serif; background: #000; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; }
 
-.marquee-text {
-    display: inline-block;
-    white-space: nowrap;
-    color: gold;
-    font-size: 0.9rem;
-    font-weight: bold;
-    animation: moveText 15s linear infinite;
-}
+        /* Minimalis Marquee */
+        .marquee { position: absolute; top: 0; width: 100%; background: #221a00; color: #ffd700; padding: 5px; font-size: 12px; overflow: hidden; white-space: nowrap; z-index: 5; }
 
-@keyframes moveText {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-}
-        body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Arial', sans-serif; overflow: hidden; background: #000; }
+        /* Optimasi Background (Gunakan warna solid jika gambar terlalu berat) */
+        .hero-bg { position: fixed; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; z-index: -1; }
+
+        .container { width: 90%; max-width: 400px; text-align: center; z-index: 1; }
+        .logo { width: 60%; margin-bottom: 15px; }
         
-        /* Background Utama */
-        .hero-bg { position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
-
-        .container { text-align: center; color: white; width: 90%; max-width: 500px; z-index: 1; }
+        .input-wrapper { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; display: flex; border: 1px solid gold; }
+        input { background: none; border: none; flex: 1; color: white; padding: 5px; outline: none; text-align: center; }
         
-        /* Logo & Judul */
-        .logo { width: 80%; max-width: 300px; margin-bottom: 20px; }
-        h1 { color: gold; text-shadow: 0 0 10px gold; font-size: 1.8rem; text-transform: uppercase; margin-bottom: 20px; }
+        .btn { background: gold; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
 
-        /* Input ID Style (Dipertahankan dari sebelumnya) */
-        .input-wrapper { background: rgba(0,0,0,0.6); padding: 15px; border: 2px solid gold; border-radius: 10px; display: flex; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        input { 
-            background: transparent; border: none; width: 60%; font-size: 1.2rem; outline: none; text-align: center;
-            color: white; /* Warna teks yang diketik */
-            font-weight: bold; /* Teks yang diketik tebal */
-        }
-        /* Style untuk Placeholder (Tulisan "USER ID ANDA") */
-        input::placeholder { color: white; font-weight: bold; opacity: 0.8; }
-        
-        .btn { padding: 12px 25px; background: gold; color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { transform: scale(1.05); }
+        /* Box dengan ukuran fix untuk performa */
+        .box-container { width: 200px; height: 200px; margin: 20px auto; cursor: pointer; }
+        .box-img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Box Animation */
-        .box-container { width: 300px; margin: 30px auto; cursor: pointer; transition: 0.3s; position: relative; }
-        .box-container:hover { transform: scale(1.05); }
-        .box-img { width: 100%; filter: drop-shadow(0 0 10px gold); }
-        
-        /* Area Hadiah (Di dalam box - Dipertahankan dari sebelumnya) */
-        #resultDisplay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: gold; font-size: 1.8rem; font-weight: bold; text-shadow: 2px 2px 4px black;
-            display: none; width: 90%;
-        }
-
-        /* --- STYLE BARU UNTUK POP-UP ANIMASI --- */
-
-        /* Overlay Pop-Up (Background Gelap) */
-        #popup {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 99;
-            opacity: 0; /* Mulai dari transparan */
-            transition: opacity 0.5s ease; /* Fade-in perlahan */
-        }
-        
-        /* Saat Pop-Up aktif, Fade-in */
-        #popup.active { opacity: 1; }
-
-        /* Konten Pop-Up */
-        .popup-content {
-            background: rgba(20, 20, 20, 0.95); 
-            padding: 40px; 
-            border: 3px solid gold; 
-            border-radius: 20px; 
-            text-align: center; 
-            width: 80%; 
-            max-width: 350px;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-            
-            /* Animasi Konten (Fade-in + Scale-up) */
-            opacity: 0;
-            transform: scale(0.7); /* Mulai dari kecil */
-            transition: all 0.5s ease-out; /* Animasi membesar dan muncul */
-        }
-
-        /* Saat Pop-Up aktif, Konten muncul dan membesar */
-        #popup.active .popup-content {
-            opacity: 1;
-            transform: scale(1); /* Ukuran normal */
-        }
-
-        .popup-content h2 { color: gold; font-size: 2.2rem; font-weight: bold; margin-bottom: 25px; text-shadow: 2px 2px 4px black; }
-
-        /* Tombol Claim di dalam Pop-up */
-        .btn-claim { width: 100%; font-size: 1.1rem; padding: 15px; }
-
+        /* Pop-up yang lebih ringan */
+        #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 100; }
+        .popup-content { background: #111; padding: 30px; border: 2px solid gold; border-radius: 15px; text-align: center; width: 85%; }
     </style>
 </head>
 <body>
-<div class="marquee-container">
-    <div class="marquee-text">
-        User ID 88***12 berhasil menang Rp 1JT! | User ID 92***55 berhasil menang Rp 500rb! | User ID 77***90 berhasil menang Rp 250rb! | Selamat kepada para pemenang hari ini!
-    </div>
-</div>
+    <div class="marquee">USER ID 88***12 MENANG 1JT! | USER ID 92***55 MENANG 500RB!</div>
     <img src="https://i.ibb.co/d0NzFXRz/ce06c9d1-3323-4440-abdd-7943be19557b.jpg" class="hero-bg">
 
     <div class="container">
         <img src="https://i.ibb.co/hxkbqp11/mysterybox.png" class="logo">
-        <h1>MYSTERY BOX EVENT</h1>
-
+        
         <div id="loginSection">
             <div class="input-wrapper">
-                <input type="text" id="userId" placeholder="USER ID ANDA">
-                <button class="btn" onclick="cekId()">MASUK</button>
+                <input type="text" id="userId" placeholder="MASUKKAN USER ID">
+                <button class="btn" onclick="cekId()">OK</button>
             </div>
         </div>
 
         <div id="gameSection" style="display:none;">
-            <div class="box-container" id="boxContainer" onclick="bukaBox()">
+            <div class="box-container" onclick="bukaBox()">
                 <img id="boxImage" src="https://i.ibb.co/rf44Yt4V/Chat-GPT-Image-Apr-26-2026-05-20-07-AM.png" class="box-img">
-                <div id="resultDisplay"></div>
             </div>
         </div>
     </div>
 
     <div id="popup">
         <div class="popup-content">
-            <h2 id="resultText">MENANG: Rp 0</h2>
-            <a href="https://medalidua.com/" style="text-decoration: none;">
-                <button class="btn btn-claim">CLAIM HADIAH SEKARANG</button>
-            </a>
+            <h2 id="resultText" style="color:gold">MENANG: Rp 0</h2>
+            <a href="https://medalidua.com/"><button class="btn" style="width:100%">CLAIM SEKARANG</button></a>
         </div>
     </div>
 
     <script>
-        // Fungsi Validasi ID
         function cekId() {
             const uid = document.getElementById('userId').value;
-            if(!uid) return alert("User ID tidak boleh kosong!");
-            
-            // Cek apakah ID sudah digunakan
-            if(localStorage.getItem('claimed_' + uid)) {
-                return alert("User ID ini sudah pernah mengambil hadiah!");
-            }
-            
+            if(!uid) return;
             document.getElementById('loginSection').style.display = "none";
             document.getElementById('gameSection').style.display = "block";
         }
 
-        let diklik = false; // Penjaga Anti-Spam Klik
-
-        // Fungsi Membuka Box
         function bukaBox() {
-            if(diklik) return;
-            diklik = true;
-            const uid = document.getElementById('userId').value;
-            
-            // 1. Ganti ke gambar box terbuka
             document.getElementById('boxImage').src = "https://i.ibb.co/Myv4XBpd/image.png";
-            
-            // 2. Efek Confetti (Ceria)
-            confetti({ particleCount: 200, spread: 120, colors: ['#ffd700', '#ffffff', '#ff0000'] });
-            
-            // 3. Logika Menghitung Hadiah & Menampilkan Pop-Up (Delay 0.8s)
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             setTimeout(() => {
-                // Daftar Hadiah Gacor
-                const hadiahArr = ["100rb", "250rb", "500rb", "750rb", "1JT"];
-                // Peluang lebih besar untuk hadiah 1JT (Hanya contoh logika, bisa diubah)
-                const r = Math.random();
-                let hasilIndex = (r < 0.60) ? 0 : (r < 0.85) ? 1 : (r < 0.95) ? 2 : (r < 0.99) ? 3 : 4;
-                
-                const hasilFinal = hadiahArr[hasilIndex];
-                
-                // Tampilkan Teks di Pop-Up
-                const resultTextDiv = document.getElementById('resultText');
-                resultTextDiv.innerText = "MENANG: Rp " + hasilFinal;
-                
-                // --- AKTIFKAN POP-UP DENGAN ANIMASI ---
-                const popup = document.getElementById('popup');
-                popup.style.display = "flex"; // Tampilkan dulu flex container-nya
-                
-                // Delay sangat singkat agar CSS Transition (Fade-in) bekerja
-                setTimeout(() => { popup.classList.add('active'); }, 50); 
-                
-                // Simpan status agar tidak bisa buka lagi
-                localStorage.setItem('claimed_' + uid, 'true');
-                
-            }, 800);
+                document.getElementById('resultText').innerText = "MENANG: Rp 500rb";
+                document.getElementById('popup').style.display = "flex";
+            }, 600);
         }
     </script>
 </body>
